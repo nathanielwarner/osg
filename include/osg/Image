@@ -17,6 +17,7 @@
 #include <osg/BufferObject>
 #include <osg/Vec2>
 #include <osg/Vec3>
+#include <osg/Vec3i>
 #include <osg/Vec4>
 #include <osg/FrameStamp>
 #include <osg/StateAttribute>
@@ -219,6 +220,9 @@ class OSG_EXPORT Image : public BufferData
 
         /** Scale image to specified size and with specified data type. */
         virtual void scaleImage(int s,int t,int r, GLenum newDataType);
+
+        /** return the dimensions of a block of compressed pixels */
+        static osg::Vec3i computeBlockFootprint(GLenum pixelFormat);
 
         /** Copy a source Image into a subpart of this Image at specified position.
           * Typically used to copy to an already allocated image, such as creating

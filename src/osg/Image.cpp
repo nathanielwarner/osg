@@ -1378,6 +1378,72 @@ void Image::scaleImage(int s,int t,int r, GLenum newDataType)
     dirty();
 }
 
+osg::Vec3i Image::computeBlockFootprint(GLenum pixelFormat)
+{
+    switch (pixelFormat)
+    {
+        case(GL_COMPRESSED_RGB_S3TC_DXT1_EXT) :
+        case(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) :
+        case(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT) :
+        case(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT) :
+            return osg::Vec3i(4,4,4);//opengl 3d dxt: r value means (max)4 consecutive blocks in r direction packed into a slab.
+
+        case(GL_COMPRESSED_SIGNED_RED_RGTC1_EXT) :
+        case(GL_COMPRESSED_RED_RGTC1_EXT) :
+        case(GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT) :
+        case(GL_COMPRESSED_RED_GREEN_RGTC2_EXT) :
+        case(GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG) :
+        case(GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG) :
+        case(GL_ETC1_RGB8_OES) :
+        case(GL_COMPRESSED_RGB8_ETC2) :
+        case(GL_COMPRESSED_SRGB8_ETC2) :
+        case(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2) :
+        case(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2) :
+        case(GL_COMPRESSED_RGBA8_ETC2_EAC) :
+        case(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC) :
+        case(GL_COMPRESSED_R11_EAC) :
+        case(GL_COMPRESSED_SIGNED_R11_EAC) :
+        case(GL_COMPRESSED_RG11_EAC) :
+        case(GL_COMPRESSED_SIGNED_RG11_EAC) :
+            return osg::Vec3i(4, 4, 1);//not sure about r
+        case(GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG) :
+        case(GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG) :
+            return osg::Vec3i(8, 4, 1);//no 3d texture support in pvrtc at all
+        case (GL_COMPRESSED_RGBA_ASTC_4x4_KHR) : return osg::Vec3i(4, 4, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_5x4_KHR) : return osg::Vec3i(5, 4, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_5x5_KHR) : return osg::Vec3i(5, 5, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_6x5_KHR) : return osg::Vec3i(6, 5, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_6x6_KHR) : return osg::Vec3i(6, 6, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_8x5_KHR) : return osg::Vec3i(8, 5, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_8x6_KHR) : return osg::Vec3i(8, 6, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_8x8_KHR) : return osg::Vec3i(8, 8, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_10x5_KHR) : return osg::Vec3i(10, 5, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_10x6_KHR) : return osg::Vec3i(10, 6, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_10x8_KHR) : return osg::Vec3i(10, 8, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_10x10_KHR) : return osg::Vec3i(10, 10, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_12x10_KHR) : return osg::Vec3i(12, 10, 1);
+        case (GL_COMPRESSED_RGBA_ASTC_12x12_KHR) : return osg::Vec3i(12, 12, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR) : return osg::Vec3i(4, 4, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR) : return osg::Vec3i(5, 4, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR) : return osg::Vec3i(5, 5, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR) : return osg::Vec3i(6, 5, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR) : return osg::Vec3i(6, 6, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR) : return osg::Vec3i(8, 5, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR) : return osg::Vec3i(8, 6, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR) : return osg::Vec3i(8, 8, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR) : return osg::Vec3i(10, 5, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR) : return osg::Vec3i(10, 6, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR) : return osg::Vec3i(10, 8, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR) : return osg::Vec3i(10, 10, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR) : return osg::Vec3i(12, 10, 1);
+        case (GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR) : return osg::Vec3i(12, 12, 1);
+
+        default:
+            break;
+    }
+    return osg::Vec3i(1,1,1);
+}
+
 void Image::copySubImage(int s_offset, int t_offset, int r_offset, const osg::Image* source)
 {
     if (!source) return;
@@ -1408,8 +1474,41 @@ void Image::copySubImage(int s_offset, int t_offset, int r_offset, const osg::Im
         return;
     }
 
-    void* data_destination = data(s_offset,t_offset,r_offset);
-
+    unsigned char* data_destination = data(s_offset, t_offset, r_offset);
+    if (isCompressed())
+    {
+        osg::Vec3i footprint = computeBlockFootprint(_pixelFormat);
+        if (footprint.x() == 4 && footprint.y() == 4)
+        {
+            if ((source->s() & 0x3) || (source->t() & 0x3) || (s_offset & 0x3) || (t_offset & 0x3))
+            {
+                OSG_WARN << "Error Image::copySubImage() did not succeed : size " << source->s() << "x" << source->t() << " or offset " << s_offset<< "," << t_offset << " not multiple of 4." << std::endl;
+                return;
+            }
+        }
+        else
+        {
+            if ((source->s() % footprint.x()) || (source->t() % footprint.y()) || (s_offset % footprint.x()) || (t_offset% footprint.y()))
+            {
+                OSG_WARN << "Error Image::copySubImage() did not succeed : size " << source->s() << "x" << source->t() << " or offset " << s_offset << "," << t_offset << " not multiple of footprint " << footprint.x() << "x" << footprint.y() << std::endl;
+                return;
+            }
+        }
+        unsigned int rowWidthInBlocks = (_s + footprint.x() - 1) / footprint.x();
+        unsigned int blockSize = computeBlockSize(_pixelFormat, 0);
+        data_destination = _data + blockSize * (rowWidthInBlocks * (t_offset / footprint.y()) + (s_offset / footprint.x()));
+        unsigned int copy_width = (osg::minimum(source->s(), _s - s_offset) + footprint.x() - 1) / footprint.x();
+        unsigned int copy_height = (osg::minimum(source->t(), _t - t_offset) + footprint.y() - 1) / footprint.y();
+        unsigned int dstRowStep = blockSize * rowWidthInBlocks;
+        unsigned int srcRowStep = blockSize * ((source->_s + footprint.x() - 1) / footprint.x());
+        const unsigned char* data_source = source->data(0, 0, 0);
+        for (unsigned int row = 0; row < copy_height; row += 1) { //copy blocks in a row, footprint.y() rows at a time
+            memcpy(data_destination, data_source, copy_width * blockSize);
+            data_source += srcRowStep;
+            data_destination += dstRowStep;
+        }
+        return;
+    }
     PixelStorageModes psm;
     psm.pack_alignment = _packing;
     psm.pack_row_length = _rowLength!=0 ? _rowLength : _s;
